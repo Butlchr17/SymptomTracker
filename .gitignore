@@ -1,6 +1,8 @@
 # Symptom Tracker .gitignore
 # Node.js dependencies
 node_modules/
+/.pnp
+.pnp.js
 npm-debug.log
 yarn-error.log
 
@@ -18,6 +20,10 @@ dist/
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 
 # OS files
 .DS_Store
@@ -27,7 +33,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.suo
-.ntvs
+*.ntvs
 *.njsproj
 *.sln
 *.sw?
