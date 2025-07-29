@@ -1,6 +1,6 @@
 # Symptom Tracker App
 
-The Symptom Tracker App is a full-stack web application that allows users to log health symptoms, view trends over time, receive AI-generated insights using Google's Gemini API, and export reports as PDF. Inspired by Truveta's mission to empower clinicians and patients with data-driven tools, this app simulates a self-monitoring solution to help identify symptom patterns, promote informed care decisions, and reduce inefficiencies in health tracking. It was developed to prepare for a Fullstack Software Engineer role at Truveta, showcasing expertise in full-stack development, AI integration, data visualization, and containerization.
+The Symptom Tracker App is a full-stack web application that allows users to log health symptoms, view trends over time, receive AI-generated insights using Google's Gemini API, and export reports as PDF. Inspired by Truveta's mission to empower clinicians and patients with data-driven tools, this app simulates a self-monitoring solution to help identify symptom patterns, promote informed care decisions, and reduce inefficiencies in health tracking. It was developed to prepare for a Fullstack Software Engineer role listing at Truveta, showcasing expertise in full-stack development, AI integration, data visualization, and containerization.
 
 ---
 
