@@ -1,0 +1,28 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/symptom_tracker
+      - REDIS_URL=redis://redis:6379
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - db
+      - redis
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: symptom_tracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db-init.sql:/docker-entrypoint-initdb.d/init.sql  # Auto-runs on init
+  redis:
+    image: redis:7
+volumes:
+  postgres_data:

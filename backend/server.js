@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const Redis = require('redis');
 const { Pool } = require('pg');
+const Redis = require('redis');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -12,28 +13,61 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Database connection
-const pool = new  Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // Redis connection for caching
-const redisClient = Redis.createClient({ url: process.env.REDDIS_URL });
+const redisClient = Redis.createClient({ url: process.env.REDIS_URL });
 redisClient.connect().catch(console.error);
+
+// Gemini AI setup
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 // Test route
 app.get('/', (req, res) => {
     res.send('Backend server is running');
 });
 
-app.listen(port, () => {
-    console.log('Server running on port' +  port );
-});
-
-// Import Gemini
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
 // Cache key helper
 const getCacheKey = (key) => `symptom:${key}`;
+
+// GET trends (specific route before :id)
+app.get('/symptoms/trends', async (req, res) => {
+    const cacheKey = 'symptoms_trends';
+    let trends = await redisClient.get(cacheKey);
+    if (trends) {
+        return res.json(JSON.parse(trends));
+    }
+    try {
+        const result = await pool.query(`
+            SELECT DATE(logged_at) as date, AVG(severity) as avg_severity
+            FROM symptoms
+            GROUP BY DATE(logged_at)
+            ORDER BY date DESC
+        `);
+        trends = result.rows;
+        await redisClient.set(cacheKey, JSON.stringify(trends), { EX: 60 });
+        res.json(trends);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET AI insight using Gemini (specific route before :id)
+app.get('/symptoms/insights', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT severity, symptom_type FROM symptoms ORDER BY logged_at DESC LIMIT 5');
+        const recentSymptoms = result.rows.map(r => `Type: ${r.symptom_type}, Severity: ${r.severity}`).join(', ');
+        const prompt = `Analyze these recent symptoms: ${recentSymptoms}. Provide a short health insight or recommendation in 1-2 sentences. If no symptoms, say "Log some symptoms for insights."`;
+        
+        const genResult = await model.generateContent(prompt);
+        const insight = genResult.response.text();
+
+        res.json({ insight });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 // GET all symptoms (cached)
 app.get('/symptoms', async (req, res) => {
@@ -52,7 +86,7 @@ app.get('/symptoms', async (req, res) => {
     }
 });
 
-// GET single symptom
+// GET single symptom (:id after specific routes)
 app.get('/symptoms/:id', async (req, res) => {
     const { id } = req.params;
     const cacheKey = getCacheKey(id);
@@ -115,40 +149,6 @@ app.delete('/symptoms/:id', async (req, res) => {
     }
 });
 
-// GET trends (aggregated severity over time, cached)
-app.get('/symptoms/trends', async (req, res) => {
-    const cacheKey = 'symptoms_trends';
-    let trends = await redisClient.get(cacheKey);
-    if (trends) {
-        return res.json(JSON.parse(trends));
-    }
-    try {
-        const result = await pool.query(`
-            SELECT DATE(logged_at) as date, AVG(severity) as avg_severity
-            FROM symptoms
-            GROUP BY DATE(logged_at)
-            ORDER BY date DESC
-        `);
-        trends = result.rows;
-        await redisClient.set(cacheKey, JSON.stringify(trends), { EX: 60 });
-        res.json(trends);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// GET AI insight using Gemini
-app.get('/symptoms/insights', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT severity, symptom_type FROM symptoms ORDER BY logged_at DESC LIMIT 5');
-        const recentSymptoms = result.rows.map(r => `Type: ${r.symptom_type}, Severity: ${r.severity}`).join(', ');
-        const prompt = `Based on these recent symptoms: ${recentSymptoms}. Provide a short health insight or recommendation.`;
-        
-        const genResult = await model.generateContent(prompt);
-        const insight = genResult.response.text();
-
-        res.json({ insight });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
