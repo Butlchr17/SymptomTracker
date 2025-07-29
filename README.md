@@ -6,7 +6,7 @@ The Symptom Tracker App is a full-stack web application that allows users to log
 
 ## Project Summary
 
-This project builds a responsive tool for tracking symptoms like headaches or fatigue, with severity ratings and notes. Key innovations include aggregated trend charts for visual analysis, real-time AI insights from Gemini (e.g., "High severity—consult a doctor"), and caching for performance. The backend handles CRUD operations with PostgreSQL and Redis, while the frontend uses React with Vite for fast development. Dockerized for easy deployment, it's portfolio-ready and extensible (e.g., add user auth or real-time alerts). Total development time: ~4-6 hours, using AI for code generation and prompt engineering.
+This project builds a responsive tool for tracking symptoms like headaches or fatigue, with severity ratings and notes. Key innovations include aggregated trend charts for visual analysis, real-time AI insights from Gemini (e.g., "High severity—consult a doctor"), and caching for performance. The backend handles CRUD operations with PostgreSQL and Redis, while the frontend uses React with Vite for fast development. Dockerized for easy deployment. Total development time: ~4-6 hours, using AI for code generation and prompt engineering.
 
 ---
 
