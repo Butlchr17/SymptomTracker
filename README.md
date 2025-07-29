@@ -64,6 +64,7 @@ PORT=5000
 DATABASE_URL=postgres://postgres:your_password@localhost:5432/symptom_tracker
 REDIS_URL=redis://localhost:6379
 GEMINI_API_KEY=your_gemini_key
+POSTGRES_PASSWORD=your_postgres_password
 ```
 
 Create DB and schema:
