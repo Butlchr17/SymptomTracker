@@ -47,44 +47,44 @@ This project builds a responsive tool for tracking symptoms like headaches or fa
 ## Installation (Local Development)
 
 ### Clone the repo:
-\`\`\`bash
+```bash
 git clone https://github.com/Butlchr17/SymptomTracker.git
 cd SymptomTracker
-\`\`\`
+```
 
 ### Backend setup:
-\`\`\`bash
+```bash
 cd backend
 npm install
-\`\`\`
+```
 
 Create \`.env\` file:
-\`\`\`
+```
 PORT=5000
 DATABASE_URL=postgres://postgres:your_password@localhost:5432/symptom_tracker
 REDIS_URL=redis://localhost:6379
 GEMINI_API_KEY=your_gemini_key
-\`\`\`
+```
 
 Create DB and schema:
-\`\`\`bash
+```bash
 createdb symptom_tracker
 psql -d symptom_tracker -f db-init.sql
-\`\`\`
+```
 
 Start backend server:
-\`\`\`bash
+```bash
 node server.js
-\`\`\`
+```
 
 ---
 
 ### Frontend setup:
-\`\`\`bash
+```bash
 cd ../frontend
 npm install
 npm run dev
-\`\`\`
+```
 
 Access frontend at: [http://localhost:5173/](http://localhost:5173/)  
 Test: Log symptoms, view trends/insights.
@@ -96,15 +96,15 @@ Test: Log symptoms, view trends/insights.
 Update root \`.env\` with required variables (e.g., \`POSTGRES_PASSWORD\`, \`GEMINI_API_KEY\`).
 
 Run:
-\`\`\`bash
+```bash
 docker compose --env-file .env up --build
-\`\`\`
+```
 
 Access at: [http://localhost/](http://localhost/)  
 Stop containers and clear data:
-\`\`\`bash
+```bash
 docker compose down -v
-\`\`\`
+```
 
 ---
 
